@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../services/location_service.dart';
 
-class WelcomeScreen extends StatelessWidget {
-  LocationService locationService;
-  WelcomeScreen({this.locationService});
+class History extends StatelessWidget {
+  final LocationService locationService;
+  History({this.locationService});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

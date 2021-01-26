@@ -89,7 +89,7 @@ class DataTableDemoState extends State<DataTableUser> {
   _updatePhoneNo(){
     String email = sendEmail.getEmail();
     String phoneNo = phoneNoController.text;
-    ServicesMP.updateName(email, phoneNo).then((result) {
+    ServicesMP.updatePhone(email, phoneNo).then((result) {
       if ('success' == result) {
         showDialog(
           context: context,

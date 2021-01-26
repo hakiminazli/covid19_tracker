@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       home: new WelcomeScreen(),
       theme: new ThemeData(
-        primaryColor: kPrimaryColor,
+        primaryColor: primaryColour,
         scaffoldBackgroundColor: Colors.blue[100],
       ),
     );

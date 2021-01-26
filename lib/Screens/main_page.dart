@@ -1,3 +1,5 @@
+import 'package:covid19_tracker/Screens/Welcome/welcome_screen.dart';
+import 'package:covid19_tracker/Screens/history.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -12,8 +14,11 @@ import 'package:covid19_tracker/screens/checkup.dart';
 import 'package:covid19_tracker/screens/maps.dart';
 import 'package:covid19_tracker/pages/newsListPage.dart';
 import 'package:covid19_tracker/viewmodels/newsArticlesListViewModel.dart';
+import 'package:covid19_tracker/services/location_service.dart';
 import 'package:covid19_tracker/Screens/Login/components/body.dart';
-import 'package:covid19_tracker/User.dart';
+
+import '../User.dart';
+import 'ManageProfile/ServicesMP.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -21,6 +26,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  LocationService locationService = LocationService();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -31,12 +37,12 @@ class _MainPageState extends State<MainPage> {
             flex: 1,
             child: ProfileHeader(),
           ),
-
           Expanded(
             flex: 3,
-            child: ControlCenter(),
+            child: ControlCenter(
+              locationService: locationService,
+            ),
           ),
-
           Container(
             color: accentColour,
             height: MediaQuery.of(context).size.height / 16,
@@ -44,16 +50,32 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
     );
-
   }
 }
 
 //TOP PROFILE HEADER
 
-class ProfileHeader extends StatelessWidget {
+class ProfileHeader extends StatefulWidget {
+  @override
+  _ProfileHeaderState createState() => _ProfileHeaderState();
+}
+
+class _ProfileHeaderState extends State<ProfileHeader> {
+  List<User> _userInfo = [];
 
   @override
   Widget build(BuildContext context) {
+    _getUser() {
+      String email = sendEmail.getEmail();
+      ServicesMP.getUser(email).then((user) {
+        setState(() {
+          _userInfo = user;
+        });
+        print("Length ${user.length}");
+      });
+    }
+
+    _getUser();
     return Padding(
       padding: const EdgeInsets.all(paddingValue),
       child: Center(
@@ -63,7 +85,7 @@ class ProfileHeader extends StatelessWidget {
             style: TextStyle(color: Colors.grey),
           ),
           subtitle: Text(
-            profileName,
+            _userInfo.length > 0 ? _userInfo.first.name : 'User',
             style: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 31),
           ),
@@ -93,10 +115,11 @@ class ProfileImage extends StatelessWidget {
   }
 }
 
-
 // CONTROL CENTER (BIG BLUE BUTTON)
 
 class ControlCenter extends StatelessWidget {
+  final LocationService locationService;
+  ControlCenter({this.locationService});
   final Room room = Room();
   final double axisSpacing = 26;
   @override
@@ -114,9 +137,7 @@ class ControlCenter extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return Card(
           shape: RoundedRectangleBorder(
-
             borderRadius: BorderRadius.circular(8),
-
           ),
           color: Colors.lightBlueAccent[100],
           child: InkWell(
@@ -126,19 +147,25 @@ class ControlCenter extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  switch (index){
+                  switch (index) {
                     case 0:
                       return ChangeNotifierProvider(
-                          builder: (_) => NewsArticleListViewModel(), child: NewsListPage());
+                        //  create: (context) {},
+                          builder: (_) => NewsArticleListViewModel(),
+                          child: NewsListPage());
                       break;
                     case 1:
-                      return Location();
+                      return History(
+                        locationService: locationService,
+                      );
                       break;
                     case 2:
                       return CheckUp();
                       break;
                     case 3:
-                      return MyLocation();
+                      return Location(
+                        locationService: locationService,
+                      );
                       break;
                     default:
                   }
@@ -153,38 +180,25 @@ class ControlCenter extends StatelessWidget {
                 size: 30,
               ),
               title: Text(
-
                 room.roomDataList[index].title,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
-
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
               ),
             ),
           ),
         );
-
       },
     );
   }
 }
 
-//USER CLASS
-class UserPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Text('User page'),
-      ),
-    );
-  }
-}
-
-
 //POWER PAGE CLASS
 class PowerPage extends StatelessWidget {
   final Room room = Room();
- // final Room room = Room();
+  // final Room room = Room();
   final double axisSpacing = 26;
   @override
   Widget build(BuildContext context) {
@@ -201,9 +215,7 @@ class PowerPage extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return Card(
           shape: RoundedRectangleBorder(
-
-              borderRadius: BorderRadius.circular(8),
-
+            borderRadius: BorderRadius.circular(8),
           ),
           color: Colors.white60,
           child: InkWell(
@@ -224,11 +236,9 @@ class PowerPage extends StatelessWidget {
                 size: 30,
               ),
               title: Text(
-
-                  room.roomDataList[index].title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  
+                room.roomDataList[index].title,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -267,7 +277,8 @@ class SettingPage extends StatelessWidget {
                   ),
                   tapCard(
                         () {
-                      LaunchUrlUtil.launchUrl('https://twitter.com/hakimin_azli');
+                      LaunchUrlUtil.launchUrl(
+                          'https://twitter.com/hakimin_azli');
                     },
                     ListTile(
                       leading: FaIcon(
@@ -283,8 +294,7 @@ class SettingPage extends StatelessWidget {
                   ),
                   tapCard(
                         () {
-                      LaunchUrlUtil.launchUrl(
-                          'https://gumroad.com/iqfareez');
+                      LaunchUrlUtil.launchUrl('https://gumroad.com/iqfareez');
                     },
                     ListTile(
                       leading: FaIcon(FontAwesomeIcons.codeBranch,
@@ -293,9 +303,7 @@ class SettingPage extends StatelessWidget {
                         'Inspiration',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle:
-                      Text('https://gumroad.com/iqfareez'),
-
+                      subtitle: Text('https://gumroad.com/iqfareez'),
                     ),
                   ),
                 ],

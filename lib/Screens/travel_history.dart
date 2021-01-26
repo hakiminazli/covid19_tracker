@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import '../screens/history.dart';
+import '../Screens/history.dart';
 import '../services/location_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Location extends StatefulWidget {
+  final LocationService locationService;
+  Location({this.locationService});
   // location
   @override
   _LocationState createState() => _LocationState();
 }
 
 class _LocationState extends State<Location> {
-  LocationService locationService = LocationService();
   var locationMessage = '';
   String latitude;
   String longitude;
@@ -23,15 +24,11 @@ class _LocationState extends State<Location> {
         desiredAccuracy: LocationAccuracy.high);
     var lat = position.latitude;
     var long = position.longitude;
-    locationService.add(position);
+    widget.locationService.add(position);
 
     // passing this to latitude and longitude strings
     latitude = "$lat";
     longitude = "$long";
-
-    setState(() {
-      locationMessage = "Latitude: $lat and Longitude: $long";
-    });
   }
 
   // function for opening it in google maps
@@ -92,8 +89,8 @@ class _LocationState extends State<Location> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => WelcomeScreen(
-                        locationService: locationService,
+                      builder: (context) => History(
+                        locationService: widget.locationService,
                       )),
                 );
               },
