@@ -11,11 +11,13 @@ import 'package:covid19_tracker/Utils/launch_url_util.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:covid19_tracker/screens/travel_history.dart';
 import 'package:covid19_tracker/screens/checkup.dart';
+import 'package:covid19_tracker/Screens/checkUpReminder.dart';
 import 'package:covid19_tracker/screens/maps.dart';
 import 'package:covid19_tracker/pages/newsListPage.dart';
 import 'package:covid19_tracker/viewmodels/newsArticlesListViewModel.dart';
 import 'package:covid19_tracker/services/location_service.dart';
 import 'package:covid19_tracker/Screens/Login/components/body.dart';
+
 
 import '../User.dart';
 import 'ManageProfile/ServicesMP.dart';
@@ -160,7 +162,7 @@ class ControlCenter extends StatelessWidget {
                       );
                       break;
                     case 2:
-                      return CheckUp();
+                      return Remainder();
                       break;
                     case 3:
                       return Location(

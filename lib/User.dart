@@ -18,3 +18,28 @@ class User {
     );
   }
 }
+
+
+class UserAddress {
+  String street;
+  String city;
+  String state;
+  String district;
+  int poskod;
+  int userID;
+
+
+  UserAddress({ this.street, this.city, this.state, this.district, this.poskod, this.userID});
+
+  factory UserAddress.fromJson(Map<String, dynamic> json) {
+    return UserAddress(
+      street: json['street'] as String,
+      city: json['city'] as String,
+      state: json['state'] as String,
+      district: json['district'] as String,
+      poskod: json['poskod'] as int,
+      userID: json['userID'] as int,
+    );
+  }
+}
+

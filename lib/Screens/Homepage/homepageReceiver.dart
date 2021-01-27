@@ -8,6 +8,7 @@ import 'package:covid19_tracker/User.dart';
 import 'package:covid19_tracker/constants.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:covid19_tracker/Screens/main_page.dart';
+import 'package:covid19_tracker/Screens/checkup.dart';
 
 class HomepageReceiver extends StatelessWidget {
   HomepageReceiver({
