@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:covid19_tracker/Screens/Login/components/background.dart';
 import 'package:covid19_tracker/Screens/ManageProfile/ManageProfile.dart';
 import 'package:covid19_tracker/Screens/Welcome/welcome_screen.dart';
-//import 'package:covid19_tracker/components/rounded_button.dart';
-import 'package:covid19_tracker/Screens/Login/components/body.dart';
-import 'package:covid19_tracker/User.dart';
+
 import 'package:covid19_tracker/constants.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:covid19_tracker/Screens/main_page.dart';
-import 'package:covid19_tracker/Screens/checkup.dart';
+
 
 class HomepageReceiver extends StatelessWidget {
   HomepageReceiver({
     Key key,
   }) : super(key: key,);
 
+  /*
    _getName()
    {
      List<User> u = userData.getUser();
@@ -28,7 +27,7 @@ class HomepageReceiver extends StatelessWidget {
     var email = u.map((u) => u.email);
     return email.toString();
   }
-
+ */
   @override
   Widget build(BuildContext context) {
     return Scaffold (
@@ -70,7 +69,8 @@ class HomepageReceiver extends StatelessWidget {
         //
         // ],
       ),
-      drawer: new Drawer(
+    /*
+     drawer: new Drawer(
         child: ListView(
           children: <Widget>[
             new UserAccountsDrawerHeader(
@@ -80,6 +80,8 @@ class HomepageReceiver extends StatelessWidget {
           ],
         ),
       ),
+
+    */
 
       body: TransferData(),
     );
@@ -129,10 +131,6 @@ class TransferDataWidget extends State {
                 icon: FaIcon(FontAwesomeIcons.userFriends),
                 label: 'User',
               ),
-              /* BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.bell),
-              label: 'Menu',
-            ),*/
               BottomNavigationBarItem(
                 icon: FaIcon(FontAwesomeIcons.cog),
                 label: 'Setting',
@@ -147,50 +145,6 @@ class TransferDataWidget extends State {
         ),
         extendBody: true,
         body: SafeArea(bottom: false, child: _children[_currentIndex]),
-
-            /*
-            RoundedButton(
-              text: "MANAGE PROFILE",
-              press: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return ManageProfile();
-                  },
-                );
-              },
-            ),
-
-
-            RoundedButton(
-              text: "LOGOUT",
-              press: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: new Text("Logout Successful"),
-                      actions: <Widget>[
-                        FlatButton(
-                          child: new Text("OK"),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    WelcomeScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-
-             */
 
 
             //SizedBox(height: size.height * 0.01),
