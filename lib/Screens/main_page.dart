@@ -202,6 +202,7 @@ class ControlCenter extends StatelessWidget {
                         runApp(LaunchingApp(store));
                       }
                       check();
+                      return LaunchingApp(store);
 
                       break;
                     case 3:
@@ -380,7 +381,7 @@ class SettingPage extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: SvgPicture.asset('images/undraw_source_code_xx2e.svg'),
+                child: SvgPicture.asset('assets/images/undraw_source_code_xx2e.svg'),
               ),
             )
           ]),
