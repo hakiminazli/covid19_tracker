@@ -28,6 +28,7 @@ import 'package:covid19_tracker/CheckUp/builder/NotificationSwitchBuilder.dart';
 import 'package:covid19_tracker/CheckUp/builder/RemainderAlertBuilder.dart';
 import 'package:covid19_tracker/CheckUp/builder/RemainderListViewBuilder.dart';
 import 'package:covid19_tracker/CheckUp/models/index.dart';
+import 'package:covid19_tracker/pages/thenewspage.dart';
 
 final df = new DateFormat('dd-MM-yyyy hh:mm a');
 
@@ -51,7 +52,7 @@ class _MainPageState extends State<MainPage> {
 
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
-                  colors: [Colors.blue[900], Colors.greenAccent]
+                  colors: [Colors.blue[900], Colors.red, Colors.blue[900]]
           )
       ),
       child: Column(
@@ -178,10 +179,7 @@ class ControlCenter extends StatelessWidget {
                 MaterialPageRoute(builder: (context) {
                   switch (index) {
                     case 0:
-                      return ChangeNotifierProvider(
-                        //  create: (context) {},
-                          builder: (_) => NewsArticleListViewModel(),
-                          child: NewsListPage());
+                      return NewsPage();
                       break;
                     case 1:
                       return History(
