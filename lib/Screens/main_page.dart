@@ -1,4 +1,4 @@
-import 'package:covid19_tracker/Screens/Welcome/welcome_screen.dart';
+import 'dart:io';
 import 'package:covid19_tracker/Screens/history.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,17 +10,31 @@ import 'package:covid19_tracker/screens/new%20file.dart';
 import 'package:covid19_tracker/Utils/launch_url_util.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:covid19_tracker/screens/travel_history.dart';
-import 'package:covid19_tracker/screens/checkup.dart';
 import 'package:covid19_tracker/Screens/checkUpReminder.dart';
-import 'package:covid19_tracker/screens/maps.dart';
 import 'package:covid19_tracker/pages/newsListPage.dart';
 import 'package:covid19_tracker/viewmodels/newsArticlesListViewModel.dart';
 import 'package:covid19_tracker/services/location_service.dart';
 import 'package:covid19_tracker/Screens/Login/components/body.dart';
-
-
 import '../User.dart';
 import 'ManageProfile/ServicesMP.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:covid19_tracker/CheckUp/store/AppState.dart';
+import 'package:covid19_tracker/CheckUp/utils/notificationHelper.dart';
+import 'package:intl/intl.dart';
+import 'package:redux/redux.dart';
+import 'package:covid19_tracker/CheckUp/store/store.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:covid19_tracker/CheckUp/builder/NotificationSwitchBuilder.dart';
+import 'package:covid19_tracker/CheckUp/builder/RemainderAlertBuilder.dart';
+import 'package:covid19_tracker/CheckUp/builder/RemainderListViewBuilder.dart';
+import 'package:covid19_tracker/CheckUp/models/index.dart';
+
+final df = new DateFormat('dd-MM-yyyy hh:mm a');
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+NotificationAppLaunchDetails notificationAppLaunchDetails;
+Store<AppState> store;
 
 class MainPage extends StatefulWidget {
   @override
@@ -32,6 +46,14 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [Colors.blue[900], Colors.greenAccent]
+          )
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -84,22 +106,24 @@ class _ProfileHeaderState extends State<ProfileHeader> {
         child: ListTile(
           title: Text(
             'Welcome!',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Colors.white),
           ),
           subtitle: Text(
             _userInfo.length > 0 ? _userInfo.first.name : 'User',
             style: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 31),
           ),
-          trailing: ProfileImage(
+          /*     trailing: ProfileImage(
             imageLocation: 'assets/images/default.png',
           ),
+
+      */
         ),
       ),
     );
   }
 }
-
+/*
 class ProfileImage extends StatelessWidget {
   const ProfileImage({Key key, this.imageLocation}) : super(key: key);
 
@@ -117,7 +141,9 @@ class ProfileImage extends StatelessWidget {
   }
 }
 
-// CONTROL CENTER (BIG BLUE BUTTON)
+ */
+
+
 
 class ControlCenter extends StatelessWidget {
   final LocationService locationService;
@@ -139,9 +165,10 @@ class ControlCenter extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return Card(
           shape: RoundedRectangleBorder(
+
             borderRadius: BorderRadius.circular(8),
           ),
-          color: Colors.lightBlueAccent[100],
+          color: Colors.lightBlueAccent[200],
           child: InkWell(
             splashColor: primaryColour.withAlpha(45),
             highlightColor: primaryColour.withAlpha(22),
@@ -162,7 +189,20 @@ class ControlCenter extends StatelessWidget {
                       );
                       break;
                     case 2:
-                      return Remainder();
+
+                      Future<void> check() async {
+                        WidgetsFlutterBinding.ensureInitialized();
+                        await initStore();
+                        store = getStore();
+                        notificationAppLaunchDetails =
+                        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+                        await initNotifications(flutterLocalNotificationsPlugin);
+                        requestIOSPermissions(flutterLocalNotificationsPlugin);
+
+                        runApp(LaunchingApp(store));
+                      }
+                      check();
+
                       break;
                     case 3:
                       return Location(
@@ -171,7 +211,7 @@ class ControlCenter extends StatelessWidget {
                       break;
                     default:
                   }
-                  return NewPage();
+                  return LaunchingApp(store);
                 }),
               );
             },
@@ -179,17 +219,21 @@ class ControlCenter extends StatelessWidget {
               leading: FaIcon(
                 room.roomDataList[index].icon,
                 color: Colors.black,
-                size: 30,
+                size: 35,
               ),
-              title: Text(
-                room.roomDataList[index].title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
+              title: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  room.roomDataList[index].title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
               ),
             ),
+            
           ),
         );
       },
@@ -197,55 +241,69 @@ class ControlCenter extends StatelessWidget {
   }
 }
 
-//POWER PAGE CLASS
-class PowerPage extends StatelessWidget {
-  final Room room = Room();
-  // final Room room = Room();
-  final double axisSpacing = 26;
+class LaunchingApp extends StatelessWidget {
+  final Store<AppState> store;
+  LaunchingApp(this.store);
+
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      padding: EdgeInsets.all(axisSpacing),
-      itemCount: room.roomDataList.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: MediaQuery.of(context).size.width > 600
-              ? 4
-              : 2, //layour rendered quite differently on different screen sizes
-          crossAxisSpacing: axisSpacing,
-          mainAxisSpacing: axisSpacing),
-      itemBuilder: (BuildContext context, int index) {
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          color: Colors.white60,
-          child: InkWell(
-            splashColor: primaryColour.withAlpha(45),
-            highlightColor: primaryColour.withAlpha(22),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  return NewPage();
-                }),
-              );
-            },
-            child: ListTile(
-              leading: FaIcon(
-                room.roomDataList[index].icon,
-                color: primaryColour,
-                size: 30,
-              ),
-              title: Text(
-                room.roomDataList[index].title,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+    return StoreProvider<AppState>(
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'REMINDERS',
+          home: Scaffold(
+            appBar: AppBar(
+              centerTitle: true,
+              title: Text('Checkup Remainder'),
+            ),
+            body: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                          padding: EdgeInsets.all(10),
+                          child: ReminderAlertBuilder()),
+                      Padding(
+                          padding: EdgeInsets.all(10),
+                          child: NotificationSwitchBuilder()),
+                    ],
+                  ),
+                  Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        "Reminders list",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      )),
+                  Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.blue,
+                              width: 2,
+                            ),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(15.0)),
+                          ),
+                          child: SizedBox(
+                            child: StoreConnector<AppState, List<Reminder>>(
+                                converter: (store) =>
+                                store.state.remindersState.reminders,
+                                builder: (context, reminders) {
+                                  return RemindersList(reminders: reminders);
+                                }),
+                            height: Platform.isAndroid ? 420 : 550,
+                          ))),
+                ],
               ),
             ),
-          ),
-        );
-      },
+          )),
+      store: store,
     );
   }
 }
@@ -255,6 +313,14 @@ class SettingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [Colors.blue, Colors.red]
+          )
+      ),
       padding: EdgeInsets.all(12),
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -271,10 +337,10 @@ class SettingPage extends StatelessWidget {
                       leading:
                       FaIcon(FontAwesomeIcons.code, color: Colors.black),
                       title: Text(
-                        'Get the source code',
+                        'Reference',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text('Name your own price @ gum.co/SxEWQ'),
+                      subtitle: Text('Gumroad @ gum.co/SxEWQ'),
                     ),
                   ),
                   tapCard(
@@ -334,3 +400,5 @@ Widget tapCard(Function _onTap, Widget _child) {
     ),
   );
 }
+
+

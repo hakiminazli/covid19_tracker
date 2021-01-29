@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:covid19_tracker/Screens/Homepage/homepageReceiver.dart';
+//import 'package:covid19_tracker/Screens/Homepage/homepageReceiver.dart';
 import 'package:covid19_tracker/Screens/Login/components/body.dart';
 import 'package:covid19_tracker/Screens/Login/login_screen.dart';
 import 'package:covid19_tracker/Screens/ManageProfile/ManagePassword.dart';
 import 'package:covid19_tracker/Screens/ManageProfile/ServicesMP.dart';
 import 'package:covid19_tracker/User.dart';
-import 'package:covid19_tracker/components/rounded_button.dart';
-import 'package:covid19_tracker/constants.dart';
+
+//import 'package:covid19_tracker/constants.dart';
 
 final nameController = TextEditingController();
 final emailController = TextEditingController();
@@ -352,6 +352,7 @@ class DataTableDemoState extends State<DataTableUser> {
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
+        /*
         appBar: AppBar(
             automaticallyImplyLeading: false,
          title: Text('USER PROFILE'),
@@ -366,6 +367,9 @@ class DataTableDemoState extends State<DataTableUser> {
           //leading: new Container(),
           centerTitle: true,
         ),
+
+      */
+
 
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(3.0),
